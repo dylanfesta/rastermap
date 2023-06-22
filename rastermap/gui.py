@@ -3,7 +3,8 @@ import os
 import shutil
 import time
 import numpy as np
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtGui import QIcon, QFont,QIntValidator,QPainter
 import pyqtgraph as pg
 from pyqtgraph import GraphicsScene
 from scipy.stats import zscore
@@ -36,14 +37,14 @@ def rect_from_line(p,d):
     prect[-1,:] = prect[0,:]
     return prect
 
-class Slider(QtGui.QSlider):
+class Slider(QtWidgets.QSlider):
     def __init__(self, bid, parent=None):
         super(self.__class__, self).__init__()
         self.bid = bid
         self.setMinimum(0)
         self.setMaximum(100)
-        self.setValue(parent.sat[bid]*200)
-        self.setTickPosition(QtGui.QSlider.TicksLeft)
+        self.setValue(int(parent.sat[bid]*200))
+        self.setTickPosition(QtWidgets.QSlider.TicksLeft)
         self.setTickInterval(10)
         self.valueChanged.connect(lambda: self.level_change(parent,bid))
         self.setTracking(False)
@@ -61,13 +62,13 @@ class Slider(QtGui.QSlider):
         parent.win.show()
 
 # custom vertical label
-class VerticalLabel(QtGui.QWidget):
+class VerticalLabel(QtWidgets.QWidget):
     def __init__(self, text=None):
         super(self.__class__, self).__init__()
         self.text = text
 
     def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
+        painter = QPainter(self)
         painter.setPen(QtCore.Qt.white)
         painter.translate(0, 0)
         painter.rotate(90)
@@ -75,7 +76,7 @@ class VerticalLabel(QtGui.QWidget):
             painter.drawText(0, 0, self.text)
         painter.end()
 
-class MainW(QtGui.QMainWindow):
+class MainW(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainW, self).__init__()
         pg.setConfigOptions(imageAxisOrder="row-major")
@@ -84,7 +85,7 @@ class MainW(QtGui.QMainWindow):
         icon_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "logo.png"
         )
-        app_icon = QtGui.QIcon()
+        app_icon = QIcon()
         app_icon.addFile(icon_path, QtCore.QSize(16, 16))
         app_icon.addFile(icon_path, QtCore.QSize(24, 24))
         app_icon.addFile(icon_path, QtCore.QSize(32, 32))
@@ -105,30 +106,30 @@ class MainW(QtGui.QMainWindow):
         self.loaded = False
 
         # ------ MENU BAR -----------------
-        loadMat =  QtGui.QAction("&Load data matrix", self)
+        loadMat =  QtWidgets.QAction("&Load data matrix", self)
         loadMat.setShortcut("Ctrl+L")
         loadMat.triggered.connect(lambda: self.load_mat(name=None))
         self.addAction(loadMat)
         # run rastermap from scratch
-        self.runRMAP = QtGui.QAction("&Run embedding algorithm", self)
+        self.runRMAP = QtWidgets.QAction("&Run embedding algorithm", self)
         self.runRMAP.setShortcut("Ctrl+R")
         self.runRMAP.triggered.connect(self.run_RMAP)
         self.addAction(self.runRMAP)
         self.runRMAP.setEnabled(False)
         # load processed data
-        loadProc = QtGui.QAction("&Load processed data", self)
+        loadProc = QtWidgets.QAction("&Load processed data", self)
         loadProc.setShortcut("Ctrl+P")
         loadProc.triggered.connect(lambda: self.load_proc(name=None))
         self.addAction(loadProc)
         # load a behavioral trace
-        self.loadBeh = QtGui.QAction(
+        self.loadBeh = QtWidgets.QAction(
             "Load behavior or stim trace (1D only)", self
         )
         self.loadBeh.triggered.connect(self.load_behavior)
         self.loadBeh.setEnabled(False)
         self.addAction(self.loadBeh)
         # export figure
-        exportFig = QtGui.QAction("Export as image (svg)", self)
+        exportFig = QtWidgets.QAction("Export as image (svg)", self)
         exportFig.triggered.connect(self.export_fig)
         exportFig.setEnabled(True)
         self.addAction(exportFig)
@@ -145,8 +146,8 @@ class MainW(QtGui.QMainWindow):
         #### --------- MAIN WIDGET LAYOUT --------- ####
         #pg.setConfigOption('background', 'w')
         #cwidget = EventWidget(self)
-        cwidget = QtGui.QWidget()
-        self.l0 = QtGui.QGridLayout()
+        cwidget = QtWidgets.QWidget()
+        self.l0 = QtWidgets.QGridLayout()
         cwidget.setLayout(self.l0)
         self.setCentralWidget(cwidget)
 
@@ -199,69 +200,69 @@ class MainW(QtGui.QMainWindow):
         self.win.ci.layout.setRowStretchFactor(1, 2)
         self.win.ci.layout.setRowStretchFactor(2, 2)
         #self.win.ci.layout.setColumnStretchFactor(0, .5)
-        self.win.ci.layout.setColumnStretchFactor(1, .1)
+        self.win.ci.layout.setColumnStretchFactor(1, 1)
         self.win.ci.layout.setColumnStretchFactor(3, 2)
 
         # self.key_on(self.win.scene().keyPressEvent)
         rs = 2
-        addROI = QtGui.QLabel("<font color='white'>add an ROI by SHIFT click</font>")
+        addROI = QtWidgets.QLabel("<font color='white'>add an ROI by SHIFT click</font>")
         self.l0.addWidget(addROI, rs+0, 0, 1, 3)
-        addROI = QtGui.QLabel("<font color='white'>delete an ROI by ALT click</font>")
+        addROI = QtWidgets.QLabel("<font color='white'>delete an ROI by ALT click</font>")
         self.l0.addWidget(addROI, rs+1, 0, 1, 3)
-        addROI = QtGui.QLabel("<font color='white'>delete last-drawn ROI by DELETE</font>")
+        addROI = QtWidgets.QLabel("<font color='white'>delete last-drawn ROI by DELETE</font>")
         self.l0.addWidget(addROI, rs+2, 0, 1, 3)
-        addROI = QtGui.QLabel("<font color='white'>delete all ROIs by ALT-DELETE</font>")
+        addROI = QtWidgets.QLabel("<font color='white'>delete all ROIs by ALT-DELETE</font>")
         self.l0.addWidget(addROI, rs+3, 0, 1, 3)
-        self.updateROI = QtGui.QPushButton("update (SPACE)")
-        self.updateROI.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Bold))
+        self.updateROI = QtWidgets.QPushButton("update (SPACE)")
+        self.updateROI.setFont(QFont("Arial", 8, QFont.Bold))
         self.updateROI.clicked.connect(self.ROI_selection)
         self.updateROI.setStyleSheet(self.styleInactive)
         self.updateROI.setEnabled(False)
         self.updateROI.setFixedWidth(100)
         self.l0.addWidget(self.updateROI, rs+4, 0, 1, 1)
-        self.saveROI = QtGui.QPushButton("save ROIs")
-        self.saveROI.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Bold))
+        self.saveROI = QtWidgets.QPushButton("save ROIs")
+        self.saveROI.setFont(QFont("Arial", 8, QFont.Bold))
         self.saveROI.clicked.connect(self.ROI_save)
         self.saveROI.setStyleSheet(self.styleInactive)
         self.saveROI.setEnabled(False)
         self.saveROI.setFixedWidth(100)
         self.l0.addWidget(self.saveROI, rs+5, 0, 1, 1)
 
-        self.makegrid = QtGui.QPushButton("make ROI grid, n=")
-        self.makegrid.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Bold))
+        self.makegrid = QtWidgets.QPushButton("make ROI grid, n=")
+        self.makegrid.setFont(QFont("Arial", 8, QFont.Bold))
         self.makegrid.clicked.connect(self.make_grid)
         self.makegrid.setStyleSheet(self.styleInactive)
         self.makegrid.setEnabled(False)
         self.makegrid.setFixedWidth(200)
         self.l0.addWidget(self.makegrid, rs+7, 0, 1, 1)
-        self.gridsize = QtGui.QLineEdit(self)
-        self.gridsize.setValidator(QtGui.QIntValidator(2, 20))
+        self.gridsize = QtWidgets.QLineEdit(self)
+        self.gridsize.setValidator(QIntValidator(2, 20))
         self.gridsize.setText("5")
         self.gridsize.setFixedWidth(45)
         self.gridsize.setAlignment(QtCore.Qt.AlignRight)
         self.gridsize.returnPressed.connect(self.make_grid)
         self.l0.addWidget(self.gridsize, rs+7, 1, 1, 1)
 
-        self.dbbutton = QtGui.QPushButton("DBSCAN clusters, ms=")
-        self.dbbutton.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Bold))
+        self.dbbutton = QtWidgets.QPushButton("DBSCAN clusters, ms=")
+        self.dbbutton.setFont(QFont("Arial", 8,QFont.Bold))
         self.dbbutton.clicked.connect(self.dbscan)
         self.dbbutton.setStyleSheet(self.styleInactive)
         self.dbbutton.setEnabled(False)
         self.dbbutton.setFixedWidth(200)
         self.l0.addWidget(self.dbbutton, rs+8, 0, 1, 1)
-        self.min_samples = QtGui.QLineEdit(self)
-        self.min_samples.setValidator(QtGui.QIntValidator(5, 200))
+        self.min_samples = QtWidgets.QLineEdit(self)
+        self.min_samples.setValidator(QIntValidator(5, 200))
         self.min_samples.setText("50")
         self.min_samples.setFixedWidth(45)
         self.min_samples.setAlignment(QtCore.Qt.AlignRight)
         self.min_samples.returnPressed.connect(self.dbscan)
         self.l0.addWidget(self.min_samples, rs+8, 1, 1, 1)
 
-        ysm = QtGui.QLabel("<font color='white'>y-binning</font>")
+        ysm = QtWidgets.QLabel("<font color='white'>y-binning</font>")
         ysm.setFixedWidth(100)
         self.l0.addWidget(ysm, rs+6, 0, 1, 1)
-        self.smooth = QtGui.QLineEdit(self)
-        self.smooth.setValidator(QtGui.QIntValidator(0, 500))
+        self.smooth = QtWidgets.QLineEdit(self)
+        self.smooth.setValidator(QIntValidator(0, 500))
         self.smooth.setText("10")
         self.smooth.setFixedWidth(45)
         self.smooth.setAlignment(QtCore.Qt.AlignRight)
@@ -289,8 +290,8 @@ class MainW(QtGui.QMainWindow):
         self.imgfull.setLevels([self.sat[0], self.sat[1]])
 
         # ------ CHOOSE CELL-------
-        #self.ROIedit = QtGui.QLineEdit(self)
-        #self.ROIedit.setValidator(QtGui.QIntValidator(0, 10000))
+        #self.ROIedit = QtWidgets.QLineEdit(self)
+        #self.ROIedit.setValidator(QIntValidator(0, 10000))
         #self.ROIedit.setText("0")
         #self.ROIedit.setFixedWidth(45)
         #self.ROIedit.setAlignment(QtCore.Qt.AlignRight)
@@ -615,7 +616,7 @@ class MainW(QtGui.QMainWindow):
                         break
 
     def ROI_save(self):
-        name = QtGui.QFileDialog.getSaveFileName(self,'ROI name (*.npy)')
+        name = QtWidgets.QFileDialog.getSaveFileName(self,'ROI name (*.npy)')
         name = name[0]
         self.proc['ROIs'] = []
         for r in self.ROIs:
@@ -791,7 +792,7 @@ class MainW(QtGui.QMainWindow):
 
     def load_mat(self, name=None):
         if name is None:
-            name = QtGui.QFileDialog.getOpenFileName(
+            name = QtWidgets.QFileDialog.getOpenFileName(
                 self, "Open *.npy", filter="*.npy"
             )
             self.fname = name[0]
@@ -855,7 +856,7 @@ class MainW(QtGui.QMainWindow):
 
     def load_proc(self, name=None):
         if name is None:
-            name = QtGui.QFileDialog.getOpenFileName(
+            name = QtWidgets.QFileDialog.getOpenFileName(
                 self, "Open processed file", filter="*.npy"
                 )
             self.fname = name[0]
@@ -948,7 +949,7 @@ class MainW(QtGui.QMainWindow):
             self.loaded = True
 
     def load_behavior(self):
-        name = QtGui.QFileDialog.getOpenFileName(
+        name = QtWidgets.QFileDialog.getOpenFileName(
             self, "Open *.npy", filter="*.npy"
         )
         name = name[0]
@@ -976,11 +977,11 @@ class MainW(QtGui.QMainWindow):
 
 def run():
     # Always start by initializing Qt (only once per application)
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     icon_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), "logo.png"
     )
-    app_icon = QtGui.QIcon()
+    app_icon = QIcon()
     app_icon.addFile(icon_path, QtCore.QSize(16, 16))
     app_icon.addFile(icon_path, QtCore.QSize(24, 24))
     app_icon.addFile(icon_path, QtCore.QSize(32, 32))

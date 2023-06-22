@@ -1,15 +1,15 @@
 import numpy as np
 import os
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 
 ### custom QDialog which allows user to fill in ops and run suite2p!
-class RunWindow(QtGui.QDialog):
+class RunWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(RunWindow, self).__init__(parent)
         self.setGeometry(50,50,600,600)
         self.setWindowTitle('Choose rastermap run options')
-        self.win = QtGui.QWidget(self)
-        self.layout = QtGui.QGridLayout()
+        self.win = QtWidgets.QWidget(self)
+        self.layout = QtWidgets.QGridLayout()
         self.layout.setHorizontalSpacing(25)
         self.win.setLayout(self.layout)
 
@@ -30,14 +30,14 @@ class RunWindow(QtGui.QDialog):
                     "start time for training set",
                     "end time for training set (if -1, use all points for training)"]
 
-        bigfont = QtGui.QFont("Arial", 10, QtGui.QFont.Bold)
+        bigfont = QtWidgets.QFont("Arial", 10, QtWidgets.QFont.Bold)
         l=0
         self.keylist = []
         self.editlist = []
         k=0
         for key in keys:
             qedit = LineEdit(k,key,self)
-            qlabel = QtGui.QLabel(key)
+            qlabel = QtWidgets.QLabel(key)
             qlabel.setToolTip(tooltips[k])
             qedit.set_text(self.ops)
             qedit.setFixedWidth(90)
@@ -47,19 +47,19 @@ class RunWindow(QtGui.QDialog):
             self.editlist.append(qedit)
             k+=1
 
-        self.layout.addWidget(QtGui.QLabel("."),19,4,1,1)
-        self.layout.addWidget(QtGui.QLabel("."),19,5,1,1)
-        self.layout.addWidget(QtGui.QLabel("."),19,6,1,1)
-        self.layout.addWidget(QtGui.QLabel("."),19,7,1,1)
-        self.layout.addWidget(QtGui.QLabel("."),19,8,1,1)
+        self.layout.addWidget(QtWidgets.QLabel("."),19,4,1,1)
+        self.layout.addWidget(QtWidgets.QLabel("."),19,5,1,1)
+        self.layout.addWidget(QtWidgets.QLabel("."),19,6,1,1)
+        self.layout.addWidget(QtWidgets.QLabel("."),19,7,1,1)
+        self.layout.addWidget(QtWidgets.QLabel("."),19,8,1,1)
 
         self.layout.setColumnStretch(4,10)
-        self.runButton = QtGui.QPushButton('RUN')
+        self.runButton = QtWidgets.QPushButton('RUN')
         self.runButton.clicked.connect(lambda: self.run_RMAP(parent))
         self.layout.addWidget(self.runButton,19,0,1,1)
         #self.runButton.setEnabled(False)
-        self.textEdit = QtGui.QTextEdit()
-        self.textEdit.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.textEdit = QtWidgets.QTextEdit()
+        self.textEdit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.layout.addWidget(self.textEdit, 20,0,30,9)
         self.process = QtCore.QProcess(self)
         self.process.readyReadStandardOutput.connect(self.stdout_write)
@@ -68,7 +68,7 @@ class RunWindow(QtGui.QDialog):
         self.process.started.connect(self.started)
         self.process.finished.connect(lambda: self.finished(parent))
         # stop process
-        self.stopButton = QtGui.QPushButton('STOP')
+        self.stopButton = QtWidgets.QPushButton('STOP')
         self.stopButton.setEnabled(False)
         self.layout.addWidget(self.stopButton, 19,1,1,1)
         self.stopButton.clicked.connect(self.stop)
@@ -135,7 +135,7 @@ class RunWindow(QtGui.QDialog):
         self.textEdit.ensureCursorVisible()
         self.error = True
 
-class LineEdit(QtGui.QLineEdit):
+class LineEdit(QtWidgets.QLineEdit):
     def __init__(self,k,key,parent=None):
         super(LineEdit,self).__init__(parent)
         self.key = key
