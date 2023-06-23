@@ -1,6 +1,7 @@
 import numpy as np
 import os
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtGui import QFont
 
 ### custom QDialog which allows user to fill in ops and run suite2p!
 class RunWindow(QtWidgets.QDialog):
@@ -30,7 +31,7 @@ class RunWindow(QtWidgets.QDialog):
                     "start time for training set",
                     "end time for training set (if -1, use all points for training)"]
 
-        bigfont = QtWidgets.QFont("Arial", 10, QtWidgets.QFont.Bold)
+        bigfont = QFont("Arial", 10, QFont.Bold)
         l=0
         self.keylist = []
         self.editlist = []
